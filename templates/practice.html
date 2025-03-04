@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function(){
+            perfom_query();
+        });
+
+        function perfom_query() {
+            let word = 'potato';
+            let api_key = '186a0412-f43c-454c-a711-6c61bf5d6fb6';   
+            let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${api_key}`;
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {},
+                success: function(response) {
+                    console.log(response);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
