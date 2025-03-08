@@ -72,6 +72,7 @@ def save_word():
 def delete_word():
     word = request.form.get('word_give')
     db.words.delete_one({'word': word})
+    db.examples.delete_many({'word': word}) 
 
     return jsonify({
         'result': 'success',
@@ -80,32 +81,34 @@ def delete_word():
 
 
 # Example API routes below this line 
-@app.route('/api/get_exs', methods=['GET'])
+@app.route("/api/get_exs", methods=["GET"])
 def get_exs():
-    word = request.args.get('word')
-    examples_data = db.examples.find({'word': word})
+    word = request.args.get("word")
+    example_data = db.examples.find({"word": word})
     examples = []
-    for example in examples_data:
-        examples.append({
-            'example': example['example'], 
-            'id': str(example['_id']),
-        })
+    for example in example_data:
+        examples.append(
+            {"example": example.get("example"), "id": str(example.get("_id"))}
+        )
     print("examples", examples)
-    return jsonify({'result': 'success', "examples": examples})
+    return jsonify({"result": "success", "examples": examples})
 
-@app.route('/api/save_ex', methods=['POST'])
+
+@app.route("/api/save_ex", methods=["POST"])
 def save_ex():
-    word = request.form.get('word')
-    example = request.form.get('example')
+    word = request.form.get("word")
+    example = request.form.get("example")
     doc = {
-        'word': word,
-        'example': example,
+        "word": word,
+        "example": example,
     }
     db.examples.insert_one(doc)
-    return jsonify({
-        'result': 'success',
-        'msg': f'the example, {example}, for the word, {word},  was saved',
-        })
+    return jsonify(
+        {
+            "result": "success",
+            "msg": f'Your example, "{example}", for "{word}" was saved!',
+        }
+    )
 
 
 @app.route('/api/delete_ex', methods=['POST'])
@@ -113,7 +116,7 @@ def delete_ex():
     id = request.form.get('id')
     word = request.form.get('word')
     db.examples.delete_one({'_id': ObjectId(id)})
-    return jsonify({'result': 'success', "msg": f'Your word, "{word}", was deleted successfully'})
+    return jsonify({'result': 'success', "msg": f'Your word, "{word}", was deleted successfully!'})
 
 if __name__ == '__main__': #run file
     app.run('0.0.0.0', port=5000, debug=True)

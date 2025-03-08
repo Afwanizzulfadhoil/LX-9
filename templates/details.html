@@ -51,8 +51,6 @@
             <div id="examples" class="container">
                 <h3 style="text-align: center;margin-bottom:1rem">Write your own sentences!</h3>
                 <ul id="example-list">
-                    <li id="ex-0">This sentence contains the word '{{ word }}'.&nbsp;&nbsp;&nbsp;<a href="javascript:delete_ex(0)">delete</a></li>
-                    <li id="ex-1">I don't like using the MS Word program.&nbsp;&nbsp;&nbsp;<a href="javascript:delete_ex(1)">delete</a></li>
                 </ul>
                 <div class="d-flex justify-content-between" style="margin-left:20px;">
                     <input id="new-example" class="form-control form-control-sm" style="margin-right: 0.5rem">
@@ -79,6 +77,7 @@
         let word = '{{ word }}';
         $(document).ready(function () {
             // get_definitions();
+            get_examples();
         });
 
 
@@ -171,13 +170,31 @@
 
         // get examples dari server
         function get_examples() {
-            $("#example-list").empty()
+            let list = $("#example-list").empty();
+            list.empty();
             $.ajax({
                 type: "GET",
-                url: `/api/get_exs?word_give=${word}`,
+                url: `/api/get_exs?word=${word}`,
                 data: {},
                 success: function (response) {
                     console.log(response)
+                    if (response.result === 'success') {
+                        let examples = response.examples;
+                        for (let i = 0; i < examples.length; i++) {
+                            let example = examples[i];
+                            let id = example.id;
+                            let sentence = example.example;
+                            let temp_html = `
+                            <li class="p-2">
+                                ${sentence}&nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-danger" onclick="delete_ex('${id}')">
+                                DELETE
+                            </button>
+                            </li>
+                            `;
+                            list.append(temp_html);
+                        }
+                    }
                 }
             });
         }
@@ -190,10 +207,15 @@
                 type: "POST",
                 url: `/api/save_ex`,
                 data: {
+                    example: new_ex,
+                    word: word,
                 },
                 success: function (response) {
-                    console.log(response)
-                    get_examples()
+                    console.log(response);
+                    if (response.result === 'success') {
+                        alert(response.msg);
+                        get_examples();
+                    }
                 }
             });
 
@@ -208,10 +230,13 @@
                 url: `/api/delete_ex`,
                 data: {
                     word: word,
-                    id: id
+                    id: id,
                 },
                 success: function (response) {
-                    get_examples()
+                    if (response.result === 'success') {
+                        alert(response.msg);
+                        get_examples();
+                    }
                 }
             });
         }
